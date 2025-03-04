@@ -1,6 +1,6 @@
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
-import { Sky } from 'three/examples/jsm/Addons.js'
+import { MarchingCubes, Sky } from 'three/examples/jsm/Addons.js'
 import { Timer } from 'three/addons/misc/Timer.js'
 import { DRACOLoader } from 'three/examples/jsm/Addons.js'
 import { GLTFLoader } from 'three/examples/jsm/Addons.js'
@@ -110,10 +110,8 @@ gltfLoader.load(
     }
 )
 
-const tentgLight = new THREE.PointLight('#ff7d46', 5)
-tentgLight.position.set(0, 2.2, 2.5)
 
-//Floor
+//Floor loader
 const floorAlphaTexture = textureLoader.load('./floor/alpha.webp')
 const floorColorTexture = textureLoader.load('./floor/coast_sand_rocks_02_1k/coast_sand_rocks_02_diff_1k.webp')
 const floorARMTexture = textureLoader.load('./floor/coast_sand_rocks_02_1k/coast_sand_rocks_02_arm_1k.webp')
