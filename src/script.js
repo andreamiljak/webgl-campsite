@@ -1,5 +1,6 @@
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
+import { MarchingCubes, Sky } from 'three/examples/jsm/Addons.js'
 import { Timer } from 'three/addons/misc/Timer.js'
 import { DRACOLoader } from 'three/examples/jsm/Addons.js'
 import { GLTFLoader } from 'three/examples/jsm/Addons.js'
