@@ -36,6 +36,21 @@ const stabla = new THREE.Group()
 scene.add(stabla)
 
 gltfLoader.load(
+    'trunk.glb',
+    (gltf) =>
+    {
+        const trunk = gltf.scene
+        trunk.scale.set(0.3, 0.3, 0.3)
+        trunk.position.x = 0.7
+        trunk.position.y = 0.3
+        trunk.position.z = 2
+        trunk.rotation.y = Math.PI - 0.3
+        
+        scene.add(trunk)
+    }
+)
+
+gltfLoader.load(
     'tentgreen.glb',
     (gltf)=>
     {
@@ -54,8 +69,6 @@ gltfLoader.load(
         scene.add(sator)
     }
 )
-
-   
 
     gltfLoader.load(
          'tentblue.glb',
@@ -79,7 +92,7 @@ gltfLoader.load(
 )
  
 gltfLoader.load(
-    'tree.glb',
+    'tree_noise.glb',
     (gltf)=>
     {
         const tree = gltf.scene
