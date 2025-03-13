@@ -1,10 +1,13 @@
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { MarchingCubes, Sky } from 'three/examples/jsm/Addons.js'
+import ghostVertexShader from './shaders/ghost/vertex.glsl'
+import ghostFragmentShader from './shaders/ghost/fragment.glsl'
 import { Timer } from 'three/addons/misc/Timer.js'
 import { DRACOLoader } from 'three/examples/jsm/Addons.js'
 import { GLTFLoader } from 'three/examples/jsm/Addons.js'
 import GUI from 'lil-gui'
+
 /**
  * Base
  */
@@ -123,7 +126,6 @@ gltfLoader.load(
     }
 )
 
-
 //Floor loader
 const floorAlphaTexture = textureLoader.load('./floor/alpha.webp')
 const floorColorTexture = textureLoader.load('./floor/coast_sand_rocks_02_1k/coast_sand_rocks_02_diff_1k.webp')
@@ -171,7 +173,8 @@ const floor = new THREE.Mesh(
 floor.rotation.x = -Math.PI * 0.5
 scene.add(floor)
 
-
+const debugObject = {}
+debugObject.color = '#5c5bc8'
 /**
  * Lights
  */
@@ -193,11 +196,42 @@ pointLight2.position.set(-1.4, 0.5, -0.6)
 scene.add(pointLight2)
 
 
+const ghostGeometry = new THREE.PlaneGeometry(2, 2, 512, 512)
+const ghostMaterial = new THREE.ShaderMaterial({
+    vertexShader: ghostVertexShader,
+    fragmentShader: ghostFragmentShader,
+    uniforms: {
+        uMaxElevation: {value: 3.7},
+        uRadius: {value: 1.3},
+        uTime: {value: 0},
+        uColor: {value: new THREE.Color(debugObject.color)}
+
+    },
+    transparent: true,
+    side: THREE.DoubleSide    
+})
+
+const ghost = new THREE.Mesh(ghostGeometry, ghostMaterial)
+ghost.scale.set(0.3, 0.3, 0.3)
+ghost.rotation.x += Math.PI / 2 + Math.PI
+ghost.position.y = 2
+scene.add(ghost)
+
+gui.add(ghostMaterial.uniforms.uMaxElevation, 'value').min(0).max(5).step(0.1).name('Max Elevation')
+gui.add(ghostMaterial.uniforms.uRadius, 'value').min(0.5).max(3).step(0.1).name('Roundness')
+gui.addColor(debugObject, 'color').name('Ghost Color').onChange(() => 
+{
+    ghostMaterial.uniforms.uColor.value.set(debugObject.color)
+})
+
+
 //GHOST
-const ghost1 = new THREE.PointLight("#8800ff", 6)
 const ghost2 = new THREE.PointLight("#ff0088", 6)
 const ghost3 = new THREE.PointLight("#008000", 6)
-scene.add(ghost1, ghost2, ghost3)
+scene.add( ghost2, ghost3)
+
+
+
 
 /**
  * Sizes
@@ -251,7 +285,6 @@ renderer.shadowMap.type = THREE.PCFSoftShadowMap
 
 //Cast and receive
 directionalLight.castShadow = true
-ghost1.castShadow = true
 ghost2.castShadow = true
 ghost3.castShadow = true
 
@@ -265,10 +298,6 @@ directionalLight.shadow.camera.bottom = -8
 directionalLight.shadow.camera.left = -8
 directionalLight.shadow.camera.near = 1
 directionalLight.shadow.camera.far = 20
-
-ghost1.shadow.mapSize.width = 256
-ghost1.shadow.mapSize.height = 256
-ghost1.shadow.camera.top = 10
 
 ghost2.shadow.mapSize.width = 256
 ghost2.shadow.mapSize.height = 256
@@ -306,11 +335,13 @@ const tick = () =>
     timer.update()
     const elapsedTime = timer.getElapsed()
     
+    ghostMaterial.uniforms.uTime.value = elapsedTime
     //GHOST
-    const ghostAngle = elapsedTime * 0.5
-    ghost1.position.x = Math.cos(ghostAngle) * 3
-    ghost1.position.z = Math.sin(ghostAngle) * 3
-    ghost1.position.y = Math.sin(ghostAngle) * Math.sin(ghostAngle * 2.34) * Math.sin(ghostAngle * 3.45)
+  
+    const ghostAngle = elapsedTime * 0.4
+    ghost.position.x = Math.cos(ghostAngle) * 3
+    ghost.position.z = Math.sin(ghostAngle) * 3
+    ghost.position.y =0.5* Math.sin(ghostAngle) * Math.sin(ghostAngle * 2.34) * Math.sin(ghostAngle * 3.45) +1
    
     const ghost2Angle = -elapsedTime * 0.38
     ghost2.position.x = Math.cos(ghost2Angle) * 4
