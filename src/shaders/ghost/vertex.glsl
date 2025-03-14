@@ -4,6 +4,9 @@ varying vec3 vWorldPosition;
 uniform float uMaxElevation;
 uniform float uRadius;
 uniform float uTime;
+uniform float uWindStrength;
+uniform float uWindSpeed;
+uniform float uWindFrequency;
 
 void main() {
     vUv = uv;
@@ -15,10 +18,7 @@ void main() {
     
     vec3 displacedPosition = position + normal * elevation;
 
-    float windStrength = 0.3;
-    float windSpeed = 4.0;
-    float windFrequency = 0.8;
-    float windEffect = sin(displacedPosition.z * windFrequency + uTime * windSpeed) * windStrength;
+    float windEffect = sin(displacedPosition.z * uWindFrequency + uTime * uWindSpeed) * uWindStrength;
     
     vec4 worldPosition = modelMatrix * vec4(displacedPosition, 1.0);
     vWorldPosition = worldPosition.xyz;

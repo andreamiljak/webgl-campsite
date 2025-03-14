@@ -174,7 +174,9 @@ floor.rotation.x = -Math.PI * 0.5
 scene.add(floor)
 
 const debugObject = {}
-debugObject.color = '#5c5bc8'
+debugObject.color1 = '#5c5bc8'
+debugObject.color2 = '#4b9179' //48973f
+
 /**
  * Lights
  */
@@ -195,43 +197,84 @@ const pointLight2 = new THREE.PointLight('#FF0000', 4)
 pointLight2.position.set(-1.4, 0.5, -0.6)
 scene.add(pointLight2)
 
-
-const ghostGeometry = new THREE.PlaneGeometry(2, 2, 512, 512)
-const ghostMaterial = new THREE.ShaderMaterial({
+//ghost1
+const ghost1Geometry = new THREE.PlaneGeometry(2, 2, 512, 512)
+const ghost1Material = new THREE.ShaderMaterial({
     vertexShader: ghostVertexShader,
     fragmentShader: ghostFragmentShader,
     uniforms: {
         uMaxElevation: {value: 3.7},
         uRadius: {value: 1.3},
         uTime: {value: 0},
-        uColor: {value: new THREE.Color(debugObject.color)}
+        uColor: {value: new THREE.Color(debugObject.color1)},
+        uWindStrength: {value: 0.6},
+        uWindSpeed: {value: 4.0},
+        uWindFrequency: {value: 0.8}
 
     },
     transparent: true,
     side: THREE.DoubleSide    
 })
 
-const ghost = new THREE.Mesh(ghostGeometry, ghostMaterial)
-ghost.scale.set(0.3, 0.3, 0.3)
-ghost.rotation.x += Math.PI / 2 + Math.PI
-ghost.position.y = 2
-scene.add(ghost)
+const ghost1 = new THREE.Mesh(ghost1Geometry, ghost1Material)
+ghost1.scale.set(0.3, 0.3, 0.3)
+ghost1.rotation.x += Math.PI / 2 + Math.PI
+ghost1.position.y = 2
+scene.add(ghost1)
 
-gui.add(ghostMaterial.uniforms.uMaxElevation, 'value').min(0).max(5).step(0.1).name('Max Elevation')
-gui.add(ghostMaterial.uniforms.uRadius, 'value').min(0.5).max(3).step(0.1).name('Roundness')
-gui.addColor(debugObject, 'color').name('Ghost Color').onChange(() => 
-{
-    ghostMaterial.uniforms.uColor.value.set(debugObject.color)
+
+const ghost2Geometry = new THREE.PlaneGeometry(2, 2, 512, 512)
+const ghost2Material = new THREE.ShaderMaterial({
+    vertexShader: ghostVertexShader,
+    fragmentShader: ghostFragmentShader,
+    uniforms: {
+        uMaxElevation: {value: 3.3},
+        uRadius: {value: 1.3},
+        uTime: {value: 0},
+        uColor: {value: new THREE.Color(debugObject.color2)},
+        uWindStrength: {value: 0.4},
+        uWindSpeed: {value: 6.0},
+        uWindFrequency: {value: 1.6}
+
+
+
+    },
+    transparent: true,
+    side: THREE.DoubleSide    
 })
 
+const ghost2 = new THREE.Mesh(ghost2Geometry, ghost2Material)
+ghost2.scale.set(0.3, 0.3, 0.3)
+ghost2.rotation.x += Math.PI / 2 + Math.PI
+ghost2.position.y = 2
+scene.add(ghost2)
+
+gui.add(ghost1Material.uniforms.uMaxElevation, 'value').min(0).max(5).step(0.1).name('Max Elevation 1')
+gui.add(ghost1Material.uniforms.uRadius, 'value').min(0.5).max(1.5).step(0.1).name('Roundness 1')
+gui.add(ghost1Material.uniforms.uWindStrength, 'value').min(0.1).max(3).step(0.1).name('Wind Sterngth 1')
+gui.add(ghost1Material.uniforms.uWindSpeed, 'value').min(0.1).max(10).step(0.1).name('Wind Speed 1')
+gui.add(ghost1Material.uniforms.uWindFrequency, 'value').min(0.1).max(10).step(0.1).name('Wind Frequency 1')
+
+gui.addColor(debugObject, 'color1').name('Ghost 1 Color').onChange(() => 
+{
+    ghost1Material.uniforms.uColor.value.set(debugObject.color1)
+})
+
+gui.add(ghost2Material.uniforms.uMaxElevation, 'value').min(0).max(5).step(0.1).name('Max Elevation 2')
+gui.add(ghost2Material.uniforms.uRadius, 'value').min(0.5).max(1.5).step(0.1).name('Roundness 2')
+gui.add(ghost2Material.uniforms.uWindStrength, 'value').min(0.1).max(3).step(0.1).name('Wind Sterngth 2')
+gui.add(ghost2Material.uniforms.uWindSpeed, 'value').min(0.1).max(10).step(0.1).name('Wind Speed 2')
+gui.add(ghost2Material.uniforms.uWindFrequency, 'value').min(0.1).max(10).step(0.1).name('Wind Frequency 2')
+
+
+gui.addColor(debugObject, 'color2').name('Ghost 2 Color').onChange(() => 
+{
+    ghost2Material.uniforms.uColor.value.set(debugObject.color2)
+})
 
 //GHOST
-const ghost2 = new THREE.PointLight("#ff0088", 6)
 const ghost3 = new THREE.PointLight("#008000", 6)
-scene.add( ghost2, ghost3)
-
-
-
+scene.add(  ghost3)
 
 /**
  * Sizes
@@ -285,7 +328,6 @@ renderer.shadowMap.type = THREE.PCFSoftShadowMap
 
 //Cast and receive
 directionalLight.castShadow = true
-ghost2.castShadow = true
 ghost3.castShadow = true
 
 
@@ -299,9 +341,6 @@ directionalLight.shadow.camera.left = -8
 directionalLight.shadow.camera.near = 1
 directionalLight.shadow.camera.far = 20
 
-ghost2.shadow.mapSize.width = 256
-ghost2.shadow.mapSize.height = 256
-ghost2.shadow.camera.top = 10
 
 ghost3.shadow.mapSize.width = 256
 ghost3.shadow.mapSize.height = 256
@@ -335,18 +374,21 @@ const tick = () =>
     timer.update()
     const elapsedTime = timer.getElapsed()
     
-    ghostMaterial.uniforms.uTime.value = elapsedTime
+    ghost1Material.uniforms.uTime.value = elapsedTime
+
+    ghost2Material.uniforms.uTime.value = elapsedTime
+
     //GHOST
   
     const ghostAngle = elapsedTime * 0.4
-    ghost.position.x = Math.cos(ghostAngle) * 3
-    ghost.position.z = Math.sin(ghostAngle) * 3
-    ghost.position.y =0.5* Math.sin(ghostAngle) * Math.sin(ghostAngle * 2.34) * Math.sin(ghostAngle * 3.45) +1
+    ghost1.position.x = Math.cos(ghostAngle) * 3
+    ghost1.position.z = Math.sin(ghostAngle) * 3
+    ghost1.position.y =0.5* Math.sin(ghostAngle) * Math.sin(ghostAngle * 2.34) * Math.sin(ghostAngle * 3.45) +1
    
     const ghost2Angle = -elapsedTime * 0.38
     ghost2.position.x = Math.cos(ghost2Angle) * 4
     ghost2.position.z = Math.sin(ghost2Angle) * 4
-    ghost2.position.y = Math.sin(ghost2Angle) * Math.sin(ghost2Angle * 2.34) * Math.sin(ghost2Angle * 3.45)
+    ghost2.position.y =0.7* Math.sin(ghost2Angle) * Math.sin(ghost2Angle * 2.34) * Math.sin(ghost2Angle * 3.45) + 0.4
    
     const ghost3Angle = elapsedTime * 0.2
     ghost3.position.x = Math.cos(ghost3Angle) * 5
